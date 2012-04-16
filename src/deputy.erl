@@ -196,6 +196,14 @@ check_rule(Value, {is, Value}) ->
 check_rule(_Value, {is, _Other}) ->
     error;
 
+check_rule(Value, {aint, Rule}) ->
+    case check_rule(Value, Rule) of
+        error ->
+            ok;
+        ok ->
+            error
+    end;
+
 check_rule(Value, {convert, Type}) when is_atom(Type) ->
     case convert(Value, Type) of
         error ->
@@ -337,6 +345,10 @@ rule_regexp_test_() ->
 rule_is_test_() ->
     [?_assertEqual(error, check_rule(undefined, {is, verydefined}) ),
      ?_assertEqual(ok,    check_rule(undefined, {is, undefined}) )
+
+rule_aint_test_() ->
+    [?_assertEqual(error, check_rule(<<"a">>, {aint, {in, [<<"a">>, <<"b">>]}}) ),
+     ?_assertEqual(ok,    check_rule(<<"b">>, {aint, {in, [<<"a">>, <<"c">>]}}) )
     ].
 
 rule_in_test_() ->
